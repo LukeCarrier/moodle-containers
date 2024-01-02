@@ -1,0 +1,94 @@
+version: "3.2"
+
+volumes:
+  cache:
+  data:
+  database:
+
+services:
+  web:
+    image: ghcr.io/lukecarrier/moodle-nginx:latest
+    ports:
+      - 8080:80
+    depends_on:
+      - app
+    volumes:
+      - type: bind
+        source: .
+        target: /app
+        consistency: cached
+
+  app:
+    image: ghcr.io/lukecarrier/moodle-php-fpm-7.4:latest
+    depends_on:
+      - database
+    env_file:
+      - .env
+    volumes:
+      - type: bind
+        source: .
+        target: /app
+        consistency: cached
+      - type: volume
+        source: data
+        target: /data
+        consistency: delegated
+      - type: bind
+        source: ./_docker/data/app/profiler
+        target: /data/profiler
+
+  cache:
+    image: redis
+    ports:
+      - 6379:6379
+    volumes:
+      - type: volume
+        source: cache
+        target: /var/lib/redis
+        consistency: delegated
+
+  database:
+    image: ghcr.io/lukecarrier/moodle-sql-server:latest
+    ports:
+      - 11433:1433
+    deploy:
+      resources:
+        limits:
+          memory: 4GB
+        reservations:
+          memory: 2GB
+    volumes:
+      - type: volume
+        source: database
+        target: /var/opt/mssql/data
+        consistency: delegated
+
+  antivirus:
+    image: mailu/clamav:latest
+    ports:
+      - 3310:3310
+
+  selenium-hub:
+    image: selenium/hub
+    ports:
+      - 4444:4444
+
+  selenium-node-chrome:
+    image: selenium/node-chrome
+    environment:
+      - HUB_PORT_4444_TCP_ADDR=selenium-hub
+      - HUB_PORT_4444_TCP_PORT=4444
+    depends_on:
+      - selenium-hub
+    ports:
+      - 5901:5900
+
+  selenium-node-firefox:
+    image: selenium/node-firefox
+    environment:
+      - HUB_PORT_4444_TCP_ADDR=selenium-hub
+      - HUB_PORT_4444_TCP_PORT=4444
+    depends_on:
+      - selenium-hub
+    ports:
+      - 5902:5900
