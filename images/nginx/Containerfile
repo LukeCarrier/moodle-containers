@@ -1,0 +1,7 @@
+ARG TARGETPLATFORM
+ARG nginx_version
+FROM --platform=$TARGETPLATFORM nginx:${nginx_version}
+
+ENV FASTCGI_UPSTREAM=app:9000
+
+COPY ./default.conf.template /etc/nginx/templates/default.conf.template

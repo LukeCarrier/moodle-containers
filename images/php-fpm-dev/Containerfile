@@ -1,0 +1,14 @@
+ARG TARGETPLATFORM
+ARG php_version
+ARG base_image_tag
+FROM --platform=$TARGETPLATFORM ghcr.io/lukecarrier/moodle-php-fpm-${php_version}:${base_image_tag}
+
+ARG php_xdebug_version
+
+RUN apt-get update \
+    && apt-get install -y autoconf gcc \
+    && pecl install xdebug-${php_xdebug_version} \
+    && docker-php-ext-enable xdebug \
+    && apt-get purge -y autoconf gcc \
+    && rm -rf /var/lib/apt/lists/*
+COPY ./xdebug.ini $PHP_INI_DIR/conf.d/moodle-xdebug.ini

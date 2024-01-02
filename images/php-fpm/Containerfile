@@ -1,0 +1,109 @@
+ARG TARGETPLATFORM
+ARG debian_version_name
+ARG php_version
+FROM --platform=$TARGETPLATFORM php:${php_version}-fpm-${debian_version_name} AS base
+
+ARG debian_version
+ARG debian_version_name
+ARG debian_version_archived=0
+
+ARG php_sqlsrv_version
+ARG php_pdo_sqlsrv_version
+ARG php_redis_version
+ARG php_zip_config_opts
+ARG php_xmlrpc_install=0
+
+RUN if [ ${debian_version_archived} != 0 ]; then \
+      echo "deb http://archive.debian.org/debian ${debian_version_name} main\n\
+deb http://archive.debian.org/debian-security ${debian_version_name}/updates main\n" >/etc/apt/sources.list; \
+    fi
+
+RUN apt-get update \
+    && apt-get install -y apt-transport-https ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN if [ "$(arch)" = "amd64" ]; then \
+      apt-get update \
+          && apt-get install -y gnupg \
+          && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+          && curl -f -o /etc/apt/sources.list.d/mssql-release.list https://packages.microsoft.com/config/debian/${debian_version}/multiarch/prod.list \
+          && apt-get update \
+          && ACCEPT_EULA=Y apt-get install -y autoconf gcc msodbcsql17 unixodbc-dev \
+          && docker-php-source extract \
+          && pecl install sqlsrv-${php_sqlsrv_version} \
+          && docker-php-ext-enable sqlsrv \
+          && pecl install pdo_sqlsrv-${php_pdo_sqlsrv_version} \
+          && docker-php-ext-enable pdo_sqlsrv \
+          && docker-php-source delete \
+          && apt-get purge -y autoconf gcc gnupg unixodbc-dev \
+          && rm -rf /var/lib/apt/lists/*; \
+    else \
+      echo "[WARN] Skipping SQL Server driver installation; architecture is $(arch), but Microsoft only publish ODBC drivers for amd64" >2; \
+    fi
+
+RUN apt-get update \
+    && apt-get update \
+    && apt-get install -y autoconf gcc libzip-dev zlib1g-dev \
+    && docker-php-ext-configure zip ${php_zip_config_opts} \
+    && docker-php-ext-install -j$(nproc) zip \
+    && apt-get purge -y autoconf gcc libzip-dev zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update \
+    && apt-get update \
+    && apt-get install -y autoconf gcc libfreetype6-dev libjpeg62-turbo-dev libpng-dev \
+    && docker-php-ext-configure gd \
+    && docker-php-ext-install -j$(nproc) gd \
+    && apt-get purge -y autoconf gcc libfreetype6-dev libjpeg62-turbo-dev libpng-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update \
+    && apt-get update \
+    && apt-get install -y autoconf gcc g++ libicu-dev \
+    && docker-php-ext-configure intl \
+    && docker-php-ext-install -j$(nproc) intl \
+    && apt-get purge -y autoconf gcc g++ libicu-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN if [ ${php_xmlrpc_install} != 0 ]; then \
+      apt-get update \
+          && apt-get install -y autoconf gcc libxml2-dev \
+          && docker-php-ext-configure xmlrpc \
+          && docker-php-ext-install -j$(nproc) xmlrpc \
+          && apt-get purge -y autoconf gcc libxml2-dev \
+          && rm -rf /var/lib/apt/lists/*; \
+    fi
+
+RUN apt-get update \
+    && apt-get install -y autoconf gcc \
+    && pecl install redis-${php_redis_version} \
+    && docker-php-ext-enable redis \
+    && apt-get purge -y autoconf gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update \
+    && apt-get update \
+    && apt-get install -y autoconf gcc libxml2-dev \
+    && docker-php-ext-configure soap \
+    && docker-php-ext-install -j$(nproc) soap \
+    && apt-get purge -y autoconf gcc libxml2-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN docker-php-ext-enable opcache
+COPY ./moodle-opcache.ini $PHP_INI_DIR/conf.d/moodle-opcache.ini
+
+COPY ./www.conf /usr/local/etc/php-fpm.d/www.conf
+
+RUN apt-get update \
+    && apt-get install -y libfcgi-bin \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get purge -y dpkg-dev \
+    && apt-get purge -y perl \
+    && apt-get purge -y --allow-remove-essential bash curl libgcc-*-dev perl-modules-* xz-utils
+
+# Drop all of the intermediary layers to reduce the image size.
+FROM scratch
+COPY --from=base / /
+ENTRYPOINT [ "docker-php-entrypoint", "--allow-to-run-as-root" ]
+ENV PHP_INI_DIR=/usr/local/etc/php
