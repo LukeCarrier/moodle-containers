@@ -1,0 +1,9 @@
+ARG TARGETPLATFORM
+ARG sql_server_version
+FROM --platform=$TARGETPLATFORM mcr.microsoft.com/mssql/server:${sql_server_version}
+
+COPY ./startup.sql /
+COPY ./entrypoint.sh /
+
+ENTRYPOINT [ "/entrypoint.sh" ]
+CMD [ ]
