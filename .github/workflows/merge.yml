@@ -1,0 +1,79 @@
+name: Merge
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+jobs:
+  tag_manifests:
+    if: ${{ github.event.pull_request.merged }}
+
+    permissions:
+      contents: read
+      packages: write
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - image: nginx
+            target_arch: amd64:arm64
+          - image: php-fpm-7.0
+            target_arch: amd64:arm64
+          - image: php-fpm-dev-7.0
+            target_arch: amd64:arm64
+          - image: php-fpm-7.2
+            target_arch: amd64:arm64
+          - image: php-fpm-dev-7.2
+            target_arch: amd64:arm64
+          - image: php-fpm-7.4
+            target_arch: amd64:arm64
+          - image: php-fpm-dev-7.4
+            target_arch: amd64:arm64
+          - image: php-fpm-8.0
+            target_arch: amd64:arm64
+          - image: php-fpm-dev-8.0
+            target_arch: amd64:arm64
+          - image: php-fpm-8.2
+            target_arch: amd64:arm64
+          - image: php-fpm-dev-8.2
+            target_arch: amd64:arm64
+          - image: sql-server
+            target_arch: amd64
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Podman
+        uses: ./.github/actions/setup-podman
+      - name: Authenticate with registry
+        uses: redhat-actions/podman-login@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Export version
+        run: |
+          set -eu
+          revision="${{ github.event.pull_request.head.sha }}"
+          echo "image_tag=git-$revision" >>"$GITHUB_ENV"
+      - name: Tag
+        run: |
+          set -eux -o pipefail
+
+          local_manifest="moodle-${{ matrix.image }}:latest"
+          remote_manifest="ghcr.io/lukecarrier/${local_manifest}"
+          podman manifest create "$local_manifest"
+
+          IFS=: read -r -a target_arch <<<"${{ matrix.target_arch }}"
+          for arch in "${target_arch[@]}"; do
+            image="ghcr.io/lukecarrier/moodle-${{ matrix.image }}:${image_tag}-${arch}"
+            podman image pull "$image"
+            podman manifest add "$local_manifest" "$image"
+          done
+
+          podman manifest push --all "$local_manifest" "$remote_manifest"
