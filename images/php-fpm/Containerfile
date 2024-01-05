@@ -7,6 +7,7 @@ ARG debian_version
 ARG debian_version_name
 ARG debian_version_archived=0
 
+ARG msodbcsql_gpg_mode
 ARG php_sqlsrv_version
 ARG php_pdo_sqlsrv_version
 ARG php_redis_version
@@ -22,11 +23,15 @@ RUN apt-get update \
     && apt-get install -y apt-transport-https ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-RUN if [ "$(arch)" = "amd64" ]; then \
+RUN if [ "$(dpkg --print-architecture)" = "amd64" ]; then \
       apt-get update \
           && apt-get install -y gnupg \
-          && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-          && curl -f -o /etc/apt/sources.list.d/mssql-release.list https://packages.microsoft.com/config/debian/${debian_version}/multiarch/prod.list \
+          && case "${msodbcsql_gpg_mode}" in \
+            apt-trust) echo "apt-trust"; curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /etc/apt/trusted.gpg.d/microsoft.gpg ;; \
+            keyring-dir) echo "keyring-dir"; curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg ;; \
+            *) echo "Check your msodbcsql_gpg_mode build arg" >&2 ;; \
+          esac \
+          && curl -f -o /etc/apt/sources.list.d/mssql-release.list https://packages.microsoft.com/config/debian/${debian_version}/prod.list \
           && apt-get update \
           && ACCEPT_EULA=Y apt-get install -y autoconf gcc msodbcsql17 unixodbc-dev \
           && docker-php-source extract \
