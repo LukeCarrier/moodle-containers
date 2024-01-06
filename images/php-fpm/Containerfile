@@ -23,6 +23,9 @@ RUN apt-get update \
     && apt-get install -y apt-transport-https ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
+RUN pear channel-update pear.php.net \
+    && pear upgrade --alldeps --force pear
+
 RUN docker-php-ext-configure mysqli \
     && docker-php-ext-install -j$(nproc) mysqli \
     && docker-php-ext-configure pdo_mysql \
