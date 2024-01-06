@@ -41,58 +41,112 @@ services:
         source: ./_docker/data/app/profiler
         target: /data/profiler
 
-  cache:
-    image: redis
-    ports:
-      - 6379:6379
-    volumes:
-      - type: volume
-        source: cache
-        target: /var/lib/redis
-        consistency: delegated
+  # cache:
+  #   image: redis
+  #   ports:
+  #     - 6379:6379
+  #   volumes:
+  #     - type: volume
+  #       source: cache
+  #       target: /var/lib/redis
+  #       consistency: delegated
 
-  database:
-    image: ghcr.io/lukecarrier/moodle-sql-server:latest
-    ports:
-      - 11433:1433
-    deploy:
-      resources:
-        limits:
-          memory: 4GB
-        reservations:
-          memory: 2GB
-    volumes:
-      - type: volume
-        source: database
-        target: /var/opt/mssql/data
-        consistency: delegated
+  # MySQL
+  #database:
+  #  image: mysql:8.2
+  #  ports:
+  #    - 13306:3306
+  #  deploy:
+  #    resources:
+  #      limits:
+  #        memory: 2GB
+  #      reservations:
+  #        memory: 1GB
+  #  volumes:
+  #    - type: volume
+  #      source: database
+  #      target: /var/lib/mysql
+  #      consistency: delegated
 
-  antivirus:
-    image: mailu/clamav:latest
-    ports:
-      - 3310:3310
+  # Oracle
+  #database:
+  #  imag e: moodlehq/moodle-db-oracle-r2:21
+  #  port s:
+  #    -  11521:1521
+  #  depl oy:
+  #    re sources:
+  #       limits:
+  #         memory: 2GB
+  #       reservations:
+  #         memory: 2GB
+  #  volu mes:
+  #    -  type: volume
+  #       source: database
+  #       target: /opt/oracle/oradata
+  #      consistency: delegated
 
-  selenium-hub:
-    image: selenium/hub
-    ports:
-      - 4444:4444
+  # PostgreSQL
+  #database:
+  #  image: postgres:16.1
+  #  ports:
+  #    - 15432:5432
+  #  env_file:
+  #    - .env
+  #  deploy:
+  #    resources:
+  #      limits:
+  #        memory: 1GB
+  #      reservations:
+  #        memory: 512MB
+  #  volumes:
+  #    - type: volume
+  #      source: database
+  #      target: /var/lib/postgresql/data
+  #      consistency: delegated
 
-  selenium-node-chrome:
-    image: selenium/node-chrome
-    environment:
-      - HUB_PORT_4444_TCP_ADDR=selenium-hub
-      - HUB_PORT_4444_TCP_PORT=4444
-    depends_on:
-      - selenium-hub
-    ports:
-      - 5901:5900
+  # SQL Server
+  #database:
+  #  image: ghcr.io/lukecarrier/moodle-sql-server:latest
+  #  ports:
+  #    - 11433:1433
+  #  deploy:
+  #    resources:
+  #      limits:
+  #        memory: 4GB
+  #      reservations:
+  #        memory: 2GB
+  #  volumes:
+  #    - type: volume
+  #      source: database
+  #      target: /var/opt/mssql/data
+  #      consistency: delegated
 
-  selenium-node-firefox:
-    image: selenium/node-firefox
-    environment:
-      - HUB_PORT_4444_TCP_ADDR=selenium-hub
-      - HUB_PORT_4444_TCP_PORT=4444
-    depends_on:
-      - selenium-hub
-    ports:
-      - 5902:5900
+  #antivirus:
+  #  image: mailu/clamav:latest
+  #  ports:
+  #    - 3310:3310
+
+  #selenium-hub:
+  #  image: selenium/hub
+  #  ports:
+  #    - 4444:4444
+
+  #selenium-node-chrome:
+  #  image: selenium/node-chrome
+  #  environment:
+  #    - HUB_PORT_4444_TCP_ADDR=selenium-hub
+  #    - HUB_PORT_4444_TCP_PORT=4444
+  #  depends_on:
+  #    - selenium-hub
+  #  ports:
+  #    - 5901:5900
+
+  #selenium-node-firefox:
+  #  image: selenium/node-firefox
+  #  environment:
+  #    - HUB_PORT_4444_TCP_ADDR=selenium-hub
+  #    - HUB_PORT_4444_TCP_PORT=4444
+  #  depends_on:
+  #    - selenium-hub
+  #  ports:
+  #    - 5902:5900
