@@ -9,25 +9,39 @@ $CFG = new stdClass();
     // MySQL
     //$CFG->dbtype    = 'mysqli';
     //$CFG->dblibrary = 'native';
-    //$CFG->dbhost    = '192.168.120.155';
-    //$CFG->dbname    = 'moodle';
+    //$CFG->dbhost    = 'database';
+    //$CFG->dbname    = 'XE';
     //$CFG->dbuser    = 'moodle';
-    //$CFG->dbpass    = 'Password123';
-    //$CFG->prefix    = 'mdl_';
+    //$CFG->dbpass    = 'm@0dl3ing';
+    //$CFG->prefix    = 'master_';
     //$CFG->dboptions = array (
     //    'dbpersist' => 0,
     //    'dbport'    => 3306,
     //    'dbsocket'  => '',
     //);
 
+    // Oracle
+    //$CFG->dbtype    = 'oci';
+    //$CFG->dblibrary = 'native';
+    //$CFG->dbhost    = 'database';
+    //$CFG->dbname    = 'XE';
+    //$CFG->dbuser    = 'moodle';
+    //$CFG->dbpass    = 'm@0dl3ing';
+    //$CFG->prefix    = 'master_';
+    //$CFG->dboptions = array (
+    //   'dbpersist' => 0,
+    //   'dbport'    => 1521,
+    //   'dbsocket'  => '',
+    //);
+
     // PostgreSQL
     //$CFG->dbtype    = 'pgsql';
     //$CFG->dblibrary = 'native';
-    //$CFG->dbhost    = '192.168.120.150';
-    //$CFG->dbname    = 'vagrant';
-    //$CFG->dbuser    = 'vagrant';
-    //$CFG->dbpass    = 'gibberish';
-    //$CFG->prefix    = 'mdl_';
+    //$CFG->dbhost    = 'database';
+    //$CFG->dbname    = 'moodle';
+    //$CFG->dbuser    = 'moodle';
+    //$CFG->dbpass    = 'moodle';
+    //$CFG->prefix    = 'master_';
     //$CFG->dboptions = array (
     //    'dbpersist' => 0,
     //    'dbport'    => 5432,
@@ -35,17 +49,17 @@ $CFG = new stdClass();
     //);
 
     // SQL Server
-    $CFG->dbtype    = 'sqlsrv';
-    $CFG->dblibrary = 'native';
-    $CFG->dbhost    = 'tcp:database,1433';
-    $CFG->dbname    = 'moodle';
-    $CFG->dbuser    = 'moodle';
-    $CFG->dbpass    = 'P4$$word';
-    $CFG->prefix    = 'mdl_';
-    $CFG->dboptions = array(
-        'dbpersist' => 0,
-        'dbsocket'  => '',
-    );
+    //$CFG->dbtype    = 'sqlsrv';
+    //$CFG->dblibrary = 'native';
+    //$CFG->dbhost    = 'tcp:database,1433';
+    //$CFG->dbname    = 'moodle';
+    //$CFG->dbuser    = 'moodle';
+    //$CFG->dbpass    = 'moodle';
+    //$CFG->prefix    = 'master_';
+    //$CFG->dboptions = array(
+    //    'dbpersist' => 0,
+    //    'dbsocket'  => '',
+    //);
 
 // Base URLs
 $_SERVER['SERVER_PORT'] = 8080; // Prevent a redirect loop caused by the Docker proxying
