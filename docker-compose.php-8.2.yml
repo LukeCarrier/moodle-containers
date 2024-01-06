@@ -12,6 +12,8 @@ services:
       - 8080:80
     depends_on:
       - app
+    security_opt:
+      - label=disable
     volumes:
       - type: bind
         source: .
@@ -24,6 +26,8 @@ services:
       - database
     env_file:
       - .env
+    security_opt:
+      - label=disable
     volumes:
       - type: bind
         source: .
