@@ -7,6 +7,9 @@ ARG debian_version
 ARG debian_version_name
 ARG debian_version_archived=0
 
+ARG php_oci8_version
+ARG oracle_instant_client
+ARG oracle_instant_client_sdk
 ARG msodbcsql_gpg_mode
 ARG php_sqlsrv_version
 ARG php_pdo_sqlsrv_version
@@ -30,6 +33,29 @@ RUN docker-php-ext-configure mysqli \
     && docker-php-ext-install -j$(nproc) mysqli \
     && docker-php-ext-configure pdo_mysql \
     && docker-php-ext-install -j$(nproc) pdo_mysql
+
+RUN if [ "$(dpkg --print-architecture)" = "amd64" ]; then \
+      apt-get update \
+          && apt-get install -y libaio1 unzip \
+          && curl -o /tmp/oracle-instant-client.zip ${oracle_instant_client} \
+          && curl -o /tmp/oracle-instant-client-sdk.zip ${oracle_instant_client_sdk} \
+          && unzip -d /opt -o /tmp/oracle-instant-client.zip \
+          && unzip -d /opt -o /tmp/oracle-instant-client-sdk.zip \
+          && rm -f /tmp/oracle-instant-client.zip /tmp/oracle-instant-client-sdk.zip \
+          && instant_client=$(echo /opt/instantclient_*) \
+          && echo $instant_client >/etc/ld.so.conf.d/oracle-instant-client.conf \
+          && ldconfig \
+          && docker-php-source extract \
+          && pecl install --configureoptions "with-oci8=\"instantclient,$instant_client\"" oci8-${php_oci8_version} \
+          && docker-php-source delete \
+          && docker-php-ext-enable oci8 \
+          && docker-php-ext-configure pdo_oci --with-pdo-oci=instantclient,$instant_client \
+          && docker-php-ext-install -j$(nproc) pdo_oci \
+          && apt-get purge -y unzip \
+          && rm -rf /var/lib/apt/lists/*; \
+    else \
+      echo "[WARN] Skipping Oracle driver installation; architecture is $(arch), but Oracle only publish Instant Client drivers for amd64" >2; \
+    fi
 
 RUN apt-get update \
     && apt-get install -y libpq-dev \
