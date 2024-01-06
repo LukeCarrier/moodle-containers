@@ -23,6 +23,14 @@ RUN apt-get update \
     && apt-get install -y apt-transport-https ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update \
+    && apt-get install -y libpq-dev \
+    && docker-php-ext-configure pgsql \
+    && docker-php-ext-install -j$(nproc) pgsql \
+    && docker-php-ext-configure pdo_pgsql \
+    && docker-php-ext-install -j$(nproc) pdo_pgsql \
+    && apt-get purge -y libpq-dev
+
 RUN if [ "$(dpkg --print-architecture)" = "amd64" ]; then \
       apt-get update \
           && apt-get install -y gnupg \
