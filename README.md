@@ -38,7 +38,7 @@ Ensure the data volume contains the requried directories:
 
 ```console
 docker-compose run --entrypoint install --rm app \
-  -d -o www-data -g www-data -m 750 /data/base /data/base/phpunit /data/behat /data/behat-faildump
+  -d -o www-data -g www-data -m 750 /data/base /data/xdebug /data/base/phpunit /data/behat /data/behat-faildump
 ```
 
 Install Moodle, over the CLI if you prefer:
@@ -50,11 +50,8 @@ docker-compose run --entrypoint php --rm app \
 
 ## Debugging
 
-To enable debugging support via Xdebug, ensure the following environment variables are set:
+To enable debugging support via Xdebug:
 
-```sh
-XDEBUG_CONFIG=remote_enable=On remote_autostart=On remote_connect_back=Off remote_host=docker.for.win.localhost remote_port=9000
-PHP_IDE_CONFIG=serverName=app
-```
-
-Then edit `docker-compose.yml` and replace the `image: ghcr.io/lukecarrier/moodle-php-fpm-7.2:latest`  line with `image: ghcr.io/lukecarrier/moodle-php-fpm-dev-7.2:latest`.
+1. Uncomment the appropriate environment variables in `.env`. You can check the Xdebug version used by each PHP version in the Makefile.
+2. Edit `docker-compose.yml` such that the `app` service uses the `moodle-php-fpm-$version-dev` image in place of `moodle-php-fpm-$version`.
+3. Configure your IDE to listen for Xdebug connections on port 9000, and set up path mapping for the Moodle directory to `/app` on the server.

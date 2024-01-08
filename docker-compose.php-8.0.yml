@@ -38,8 +38,8 @@ services:
         target: /data
         consistency: delegated
       - type: bind
-        source: ./_docker/data/app/profiler
-        target: /data/profiler
+        source: ./_docker/data/app/xdebug
+        target: /data/xdebug
 
   #cache:
   #  image: redis
