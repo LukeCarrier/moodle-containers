@@ -34,6 +34,7 @@ build-php-fpm-7.0-amd64:
 	  --build-arg oracle_instant_client=https://download.oracle.com/otn_software/linux/instantclient/23c/instantclient-basic-linux.x64-23.3.0.0.0.zip \
 	  --build-arg oracle_instant_client_sdk=https://download.oracle.com/otn_software/linux/instantclient/23c/instantclient-sdk-linux.x64-23.3.0.0.0.zip \
 	  --build-arg msodbcsql_gpg_mode=apt-trust \
+	  --build-arg php_exif_install=0 \
 	  --build-arg php_oci8_version=2.2.0 \
 	  --build-arg php_sqlsrv_version=5.3.0 \
 	  --build-arg php_pdo_sqlsrv_version=5.3.0 \
@@ -68,6 +69,7 @@ build-php-fpm-7.0-arm64:
 	  --build-arg oracle_instant_client=https://download.oracle.com/otn_software/linux/instantclient/23c/instantclient-basic-linux.x64-23.3.0.0.0.zip \
 	  --build-arg oracle_instant_client_sdk=https://download.oracle.com/otn_software/linux/instantclient/23c/instantclient-sdk-linux.x64-23.3.0.0.0.zip \
 	  --build-arg msodbcsql_gpg_mode=apt-trust \
+	  --build-arg php_exif_install=0 \
 	  --build-arg php_oci8_version=2.2.0 \
 	  --build-arg php_sqlsrv_version=5.3.0 \
 	  --build-arg php_pdo_sqlsrv_version=5.3.0 \
@@ -101,6 +103,7 @@ build-php-fpm-7.2-amd64:
 	  --build-arg oracle_instant_client=https://download.oracle.com/otn_software/linux/instantclient/23c/instantclient-basic-linux.x64-23.3.0.0.0.zip \
 	  --build-arg oracle_instant_client_sdk=https://download.oracle.com/otn_software/linux/instantclient/23c/instantclient-sdk-linux.x64-23.3.0.0.0.zip \
 	  --build-arg msodbcsql_gpg_mode=apt-trust \
+	  --build-arg php_exif_install=0 \
 	  --build-arg php_oci8_version=2.2.0 \
 	  --build-arg php_sqlsrv_version=5.6.1 \
 	  --build-arg php_pdo_sqlsrv_version=5.6.1 \
@@ -134,6 +137,7 @@ build-php-fpm-7.2-arm64:
 	  --build-arg oracle_instant_client=https://download.oracle.com/otn_software/linux/instantclient/23c/instantclient-basic-linux.x64-23.3.0.0.0.zip \
 	  --build-arg oracle_instant_client_sdk=https://download.oracle.com/otn_software/linux/instantclient/23c/instantclient-sdk-linux.x64-23.3.0.0.0.zip \
 	  --build-arg msodbcsql_gpg_mode=apt-trust \
+	  --build-arg php_exif_install=0 \
 	  --build-arg php_oci8_version=2.2.0 \
 	  --build-arg php_sqlsrv_version=5.6.1 \
 	  --build-arg php_pdo_sqlsrv_version=5.6.1 \
@@ -167,6 +171,7 @@ build-php-fpm-7.4-amd64:
 	  --build-arg oracle_instant_client=https://download.oracle.com/otn_software/linux/instantclient/23c/instantclient-basic-linux.x64-23.3.0.0.0.zip \
 	  --build-arg oracle_instant_client_sdk=https://download.oracle.com/otn_software/linux/instantclient/23c/instantclient-sdk-linux.x64-23.3.0.0.0.zip \
 	  --build-arg msodbcsql_gpg_mode=apt-trust \
+	  --build-arg php_exif_install=1 \
 	  --build-arg php_oci8_version=2.2.0 \
 	  --build-arg php_sqlsrv_version=5.8.1 \
 	  --build-arg php_pdo_sqlsrv_version=5.8.1 \
@@ -200,6 +205,7 @@ build-php-fpm-7.4-arm64:
 	  --build-arg oracle_instant_client=https://download.oracle.com/otn_software/linux/instantclient/23c/instantclient-basic-linux.x64-23.3.0.0.0.zip \
 	  --build-arg oracle_instant_client_sdk=https://download.oracle.com/otn_software/linux/instantclient/23c/instantclient-sdk-linux.x64-23.3.0.0.0.zip \
 	  --build-arg msodbcsql_gpg_mode=apt-trust \
+	  --build-arg php_exif_install=1 \
 	  --build-arg php_oci8_version=2.2.0 \
 	  --build-arg php_sqlsrv_version=5.8.1 \
 	  --build-arg php_pdo_sqlsrv_version=5.8.1 \
@@ -233,6 +239,7 @@ build-php-fpm-8.0-amd64:
 	  --build-arg oracle_instant_client=https://download.oracle.com/otn_software/linux/instantclient/23c/instantclient-basic-linux.x64-23.3.0.0.0.zip \
 	  --build-arg oracle_instant_client_sdk=https://download.oracle.com/otn_software/linux/instantclient/23c/instantclient-sdk-linux.x64-23.3.0.0.0.zip \
 	  --build-arg msodbcsql_gpg_mode=apt-trust \
+	  --build-arg php_exif_install=1 \
 	  --build-arg php_oci8_version=3.0.1 \
 	  --build-arg php_sqlsrv_version=5.11.1 \
 	  --build-arg php_pdo_sqlsrv_version=5.11.1 \
@@ -266,6 +273,7 @@ build-php-fpm-8.0-arm64:
 	  --build-arg oracle_instant_client=https://download.oracle.com/otn_software/linux/instantclient/23c/instantclient-basic-linux.x64-23.3.0.0.0.zip \
 	  --build-arg oracle_instant_client_sdk=https://download.oracle.com/otn_software/linux/instantclient/23c/instantclient-sdk-linux.x64-23.3.0.0.0.zip \
 	  --build-arg msodbcsql_gpg_mode=apt-trust \
+	  --build-arg php_exif_install=1 \
 	  --build-arg php_oci8_version=3.0.1 \
 	  --build-arg php_sqlsrv_version=5.11.1 \
 	  --build-arg php_pdo_sqlsrv_version=5.11.1 \
@@ -299,6 +307,7 @@ build-php-fpm-8.2-amd64:
 	  --build-arg oracle_instant_client=https://download.oracle.com/otn_software/linux/instantclient/23c/instantclient-basic-linux.x64-23.3.0.0.0.zip \
 	  --build-arg oracle_instant_client_sdk=https://download.oracle.com/otn_software/linux/instantclient/23c/instantclient-sdk-linux.x64-23.3.0.0.0.zip \
 	  --build-arg msodbcsql_gpg_mode=keyring-dir \
+	  --build-arg php_exif_install=1 \
 	  --build-arg php_oci8_version=3.3.0 \
 	  --build-arg php_sqlsrv_version=5.11.1 \
 	  --build-arg php_pdo_sqlsrv_version=5.11.1 \
@@ -332,6 +341,7 @@ build-php-fpm-8.2-arm64:
 	  --build-arg oracle_instant_client=https://download.oracle.com/otn_software/linux/instantclient/23c/instantclient-basic-linux.x64-23.3.0.0.0.zip \
 	  --build-arg oracle_instant_client_sdk=https://download.oracle.com/otn_software/linux/instantclient/23c/instantclient-sdk-linux.x64-23.3.0.0.0.zip \
 	  --build-arg msodbcsql_gpg_mode=keyring-dir \
+	  --build-arg php_exif_install=1 \
 	  --build-arg php_oci8_version=3.3.0 \
 	  --build-arg php_sqlsrv_version=5.11.1 \
 	  --build-arg php_pdo_sqlsrv_version=5.11.1 \
