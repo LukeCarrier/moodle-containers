@@ -11,6 +11,7 @@ ARG php_oci8_version
 ARG oracle_instant_client
 ARG oracle_instant_client_sdk
 ARG msodbcsql_gpg_mode
+ARG php_exif_install=1
 ARG php_sqlsrv_version
 ARG php_pdo_sqlsrv_version
 ARG php_redis_version
@@ -111,6 +112,15 @@ RUN apt-get update \
     && docker-php-ext-install -j$(nproc) intl \
     && apt-get purge -y autoconf gcc g++ libicu-dev \
     && rm -rf /var/lib/apt/lists/*
+
+RUN if [ ${php_exif_install} != 0 ]; then \
+      apt-get update \
+          && apt-get install -y autoconf gcc libexif-dev \
+          && docker-php-ext-configure exif \
+          && docker-php-ext-install -j$(nproc) exif \
+          && apt-get purge -y autoconf gcc libexif-dev \
+          && rm -rf /var/lib/apt/lists/*; \
+    fi
 
 RUN if [ ${php_xmlrpc_install} != 0 ]; then \
       apt-get update \
