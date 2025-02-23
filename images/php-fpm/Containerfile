@@ -43,14 +43,20 @@ RUN if [ "$(dpkg --print-architecture)" = "amd64" ]; then \
           && unzip -d /opt -o /tmp/oracle-instant-client.zip \
           && unzip -d /opt -o /tmp/oracle-instant-client-sdk.zip \
           && rm -f /tmp/oracle-instant-client.zip /tmp/oracle-instant-client-sdk.zip \
-          && instant_client=$(echo /opt/instantclient_*) \
-          && echo $instant_client >/etc/ld.so.conf.d/oracle-instant-client.conf \
+          && instant_client="$(echo /opt/instantclient_*)" \
+          && instant_client_oci8="$instant_client" \
+          && instant_client_pdo_oci="$instant_client" \
+          && echo "$instant_client" >/etc/ld.so.conf.d/oracle-instant-client.conf \
+          && if echo "${oracle_instant_client}" | grep -q -- "-12.1."; then \
+                 ln -s "$instant_client"/libclntsh.so.*.1 "$instant_client/libclntsh.so"; \
+                 instant_client_pdo_oci="$instant_client,12.1"; \
+             fi \
           && ldconfig \
           && docker-php-source extract \
-          && pecl install --configureoptions "with-oci8=\"instantclient,$instant_client\"" oci8-${php_oci8_version} \
+          && pecl install --configureoptions "with-oci8=\"instantclient,$instant_client_oci8\"" oci8-${php_oci8_version} \
           && docker-php-source delete \
           && docker-php-ext-enable oci8 \
-          && docker-php-ext-configure pdo_oci --with-pdo-oci=instantclient,$instant_client \
+          && docker-php-ext-configure pdo_oci --with-pdo-oci="instantclient,$instant_client_pdo_oci" \
           && docker-php-ext-install -j$(nproc) pdo_oci \
           && apt-get purge -y unzip \
           && rm -rf /var/lib/apt/lists/*; \
