@@ -35,11 +35,11 @@ RUN docker-php-ext-configure mysqli \
     && docker-php-ext-configure pdo_mysql \
     && docker-php-ext-install -j$(nproc) pdo_mysql
 
+COPY ./mirror/oracle/${oracle_instant_client} /tmp/oracle-instant-client.zip
+COPY ./mirror/oracle/${oracle_instant_client_sdk} /tmp/oracle-instant-client-sdk.zip
 RUN if [ "$(dpkg --print-architecture)" = "amd64" ]; then \
       apt-get update \
           && apt-get install -y libaio1 unzip \
-          && curl -o /tmp/oracle-instant-client.zip ${oracle_instant_client} \
-          && curl -o /tmp/oracle-instant-client-sdk.zip ${oracle_instant_client_sdk} \
           && unzip -d /opt -o /tmp/oracle-instant-client.zip \
           && unzip -d /opt -o /tmp/oracle-instant-client-sdk.zip \
           && rm -f /tmp/oracle-instant-client.zip /tmp/oracle-instant-client-sdk.zip \
