@@ -11,6 +11,7 @@ jobs:
       matrix:
         image:
           - nginx
+          - php-fpm-5.6
           - php-fpm-7.0
           - php-fpm-7.2
           - php-fpm-7.4
@@ -33,7 +34,9 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          lfs: 'true'
       - name: Setup Podman
         uses: ./.github/actions/setup-podman
       - name: Authenticate with registry
@@ -68,6 +71,8 @@ jobs:
       matrix:
         include:
           - image: nginx
+            target_arch: amd64:arm64
+          - image: php-fpm-5.6
             target_arch: amd64:arm64
           - image: php-fpm-7.0
             target_arch: amd64:arm64

@@ -35,22 +35,28 @@ RUN docker-php-ext-configure mysqli \
     && docker-php-ext-configure pdo_mysql \
     && docker-php-ext-install -j$(nproc) pdo_mysql
 
+COPY ./mirror/oracle/${oracle_instant_client} /tmp/oracle-instant-client.zip
+COPY ./mirror/oracle/${oracle_instant_client_sdk} /tmp/oracle-instant-client-sdk.zip
 RUN if [ "$(dpkg --print-architecture)" = "amd64" ]; then \
       apt-get update \
           && apt-get install -y libaio1 unzip \
-          && curl -o /tmp/oracle-instant-client.zip ${oracle_instant_client} \
-          && curl -o /tmp/oracle-instant-client-sdk.zip ${oracle_instant_client_sdk} \
           && unzip -d /opt -o /tmp/oracle-instant-client.zip \
           && unzip -d /opt -o /tmp/oracle-instant-client-sdk.zip \
           && rm -f /tmp/oracle-instant-client.zip /tmp/oracle-instant-client-sdk.zip \
-          && instant_client=$(echo /opt/instantclient_*) \
-          && echo $instant_client >/etc/ld.so.conf.d/oracle-instant-client.conf \
+          && instant_client="$(echo /opt/instantclient_*)" \
+          && instant_client_oci8="$instant_client" \
+          && instant_client_pdo_oci="$instant_client" \
+          && echo "$instant_client" >/etc/ld.so.conf.d/oracle-instant-client.conf \
+          && if echo "${oracle_instant_client}" | grep -q -- "-12.1."; then \
+                 ln -s "$instant_client"/libclntsh.so.*.1 "$instant_client/libclntsh.so"; \
+                 instant_client_pdo_oci="$instant_client,12.1"; \
+             fi \
           && ldconfig \
           && docker-php-source extract \
-          && pecl install --configureoptions "with-oci8=\"instantclient,$instant_client\"" oci8-${php_oci8_version} \
+          && pecl install --configureoptions "with-oci8=\"instantclient,$instant_client_oci8\"" oci8-${php_oci8_version} \
           && docker-php-source delete \
           && docker-php-ext-enable oci8 \
-          && docker-php-ext-configure pdo_oci --with-pdo-oci=instantclient,$instant_client \
+          && docker-php-ext-configure pdo_oci --with-pdo-oci="instantclient,$instant_client_pdo_oci" \
           && docker-php-ext-install -j$(nproc) pdo_oci \
           && apt-get purge -y unzip \
           && rm -rf /var/lib/apt/lists/*; \
@@ -66,7 +72,7 @@ RUN apt-get update \
     && docker-php-ext-install -j$(nproc) pdo_pgsql \
     && apt-get purge -y libpq-dev
 
-RUN if [ "$(dpkg --print-architecture)" = "amd64" ]; then \
+RUN if [ "$(dpkg --print-architecture)" = "amd64" ] && [ "${php_sqlsrv_version}" != "" ] && [ "${php_pdo_sqlsrv_version}" != "" ]; then \
       apt-get update \
           && apt-get install -y gnupg \
           && case "${msodbcsql_gpg_mode}" in \
@@ -86,7 +92,8 @@ RUN if [ "$(dpkg --print-architecture)" = "amd64" ]; then \
           && apt-get purge -y autoconf gcc gnupg unixodbc-dev \
           && rm -rf /var/lib/apt/lists/*; \
     else \
-      echo "[WARN] Skipping SQL Server driver installation; architecture is $(arch), but Microsoft only publish ODBC drivers for amd64" >2; \
+      echo "[WARN] Skipping SQL Server driver installation" >&2; \
+      echo "       Microsoft only publish ODBC drivers for amd64, and only for PHP >= 7.0" >2; \
     fi
 
 RUN apt-get update \
