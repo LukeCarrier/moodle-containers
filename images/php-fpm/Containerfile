@@ -72,7 +72,7 @@ RUN apt-get update \
     && docker-php-ext-install -j$(nproc) pdo_pgsql \
     && apt-get purge -y libpq-dev
 
-RUN if [ "$(dpkg --print-architecture)" = "amd64" ]; then \
+RUN if [ "$(dpkg --print-architecture)" = "amd64" ] && [ "${php_sqlsrv_version}" != "" ] && [ "${php_pdo_sqlsrv_version}" != "" ]; then \
       apt-get update \
           && apt-get install -y gnupg \
           && case "${msodbcsql_gpg_mode}" in \
@@ -92,7 +92,8 @@ RUN if [ "$(dpkg --print-architecture)" = "amd64" ]; then \
           && apt-get purge -y autoconf gcc gnupg unixodbc-dev \
           && rm -rf /var/lib/apt/lists/*; \
     else \
-      echo "[WARN] Skipping SQL Server driver installation; architecture is $(arch), but Microsoft only publish ODBC drivers for amd64" >2; \
+      echo "[WARN] Skipping SQL Server driver installation" >&2; \
+      echo "       Microsoft only publish ODBC drivers for amd64, and only for PHP >= 7.0" >2; \
     fi
 
 RUN apt-get update \
